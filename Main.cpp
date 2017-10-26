@@ -117,6 +117,10 @@ GLfloat LightDif[] = { 0.9f,  0.9f, 0.9f, 1.0f};		// Valores de la componente di
 GLfloat LightSpc[] = { 0.5f,  0.5f, 0.5f, 1.0f};		// Valores de la componente especular
 CVector lightPosition;
 
+GLfloat LightAmb2[] = { 0.3f,  0.3f, 0.3f, 1.0f };		// Valores de la componente ambiente
+GLfloat LightDif2[] = { 0.4f,  0.4f, 0.4f, 1.0f };		// Valores de la componente difusa
+GLfloat LightSpc2[] = { 0.2f,  0.2f, 0.2f, 1.0f };		// Valores de la componente especular
+
 //Cambios para Fuentes
 //Buscar el comentario anterior para ver todos los cambios necesarios
 //Acceso a la clase CFont
@@ -602,7 +606,13 @@ int IniGL(GLvoid)										// Aqui se configuran los parametros iniciales de Ope
 	glLightfv(GL_LIGHT0, GL_SPECULAR, LightSpc);		// Componente especular
 
 	glEnable(GL_LIGHT0);								// Activa luz0
-    glEnable(GL_LIGHTING);								// Habilita la iluminación
+
+	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmb2);		// Componente ambiente
+	glLightfv(GL_LIGHT1, GL_POSITION, LightPos);		// Posicion de la luz0
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDif2);		// Componente difusa
+	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpc2);		// Componente especular
+
+	glEnable(GL_LIGHTING);								// Habilita la iluminación
 
 	e=gluNewQuadric();
 
@@ -2076,21 +2086,21 @@ void dibujaTituloJuego() { //Para dibujar en la pantalla.
 		else
 			glColor3f(1.0f, 1.0f, 1.0f);
 
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.35f, infGame.glHeight*0.75f, "Start");
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.38f, infGame.glHeight*0.50f, "Start");
 
 		if (infGame.opcionMenuSelec == 1)
 			glColor3f(0.0f, 1.0f, 0.0f);
 		else
 			glColor3f(1.0f, 1.0f, 1.0f);
 
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.35f, infGame.glHeight*0.50f, "Options");
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.38f, infGame.glHeight*0.40f, "Options");
 
 		if (infGame.opcionMenuSelec == 2)
 			glColor3f(0.0f, 1.0f, 0.0f);
 		else
 			glColor3f(1.0f, 1.0f, 1.0f);
 
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.35f, infGame.glHeight*0.3f, "Quit");
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.38f, infGame.glHeight*0.30f, "Quit");
 
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glDisable(GL_TEXTURE_2D);
@@ -2249,7 +2259,7 @@ void dibujaVolumendeSombra() {
 
 int RenderizaEscena(GLvoid)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glLoadIdentity();
 		
 	//gluLookAt(-100.0f, 30.0f, 90.0f, -30.0f, 25.0f, 0.0f, 0, 1, 0);
@@ -2264,6 +2274,9 @@ int RenderizaEscena(GLvoid)
 	if(player1.kick == true)
 		AnimacionSalto();
 
+	glDisable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	
 	DibujaEscenario();
 	ejemploDeteccionCamara();
 
@@ -2275,7 +2288,56 @@ int RenderizaEscena(GLvoid)
 			glScalef(player1.escalaX,player1.escalaY,player1.escalaZ);
 			DibujaPersonaje();
 		glPopMatrix();
+
+	//	dibujaVolumendeSombra(); solo para probar
 	}
+
+	glColorMask(0, 0, 0, 0);
+	glDepthMask(0);
+	
+	//SOMBRAS
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 0, 0);
+	glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+		
+	//1er paso de la prueba de pase de profundidad. 
+	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR); 
+	glCullFace(GL_BACK); //Significa que del volumen de sombra solo va a dibujar las caras frontales.
+	dibujaVolumendeSombra();
+
+	//Segundo paso de prueba de pase de profundidad.
+	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
+	glCullFace(GL_FRONT); 
+	dibujaVolumendeSombra();
+
+	glCullFace(GL_BACK);
+
+	glColorMask(1, 1, 1, 1);
+	glDepthMask(1);
+
+	glStencilFunc(GL_NOTEQUAL,1,1);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+	glDisable(GL_LIGHT1);
+	glEnable(GL_LIGHT0);
+
+	DibujaEscenario();
+	ejemploDeteccionCamara();
+
+	if (player1.visible == true)
+	{
+		glPushMatrix();
+		glTranslatef(player1.PosicionObj.x, player1.PosicionObj.y + altPiso + 1.3f, player1.PosicionObj.z);
+		glRotatef(player1.AngObj, 0.0f, 1.0f, 0.0f);
+		glScalef(player1.escalaX, player1.escalaY, player1.escalaZ);
+		DibujaPersonaje();
+		glPopMatrix();
+
+		//	dibujaVolumendeSombra(); solo para probar
+	}
+
+	glDisable(GL_STENCIL_TEST);
+
 
 	IndicadorVidas();
 
@@ -2448,7 +2510,7 @@ BOOL CreaVentanaOGL(char* title, int width, int height, int bits)
 		0,											// No Accumulation Buffer
 		0, 0, 0, 0,									// Accumulation Bits Ignored
 		16,											// 16Bit Z-Buffer (Depth Buffer)  
-		0,											// No Stencil Buffer
+		1,											// No Stencil Buffer (0) Stencil Buffer (1)
 		0,											// No Auxiliary Buffer
 		PFD_MAIN_PLANE,								// Main Drawing Layer
 		0,											// Reserved
