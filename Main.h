@@ -28,18 +28,29 @@ struct infoScene
 	int numMapa;
 };
 
+struct opcionesMenuPrincipal
+{
+	int opcionSelec;
+	int dificultad; //0: facil, 1: normal, 2: dificil
+	int numVidas;
+	int sonido;
+};
+
 struct infoGame
 {
 	int glWidth;
 	int glHeight;
 	//0: inicializa datos, 1: dibuja logo estudio, 2: pantalla de carga
 	//3: introduccion, 4: titulo del juego, 5: Menu principal,
-	//6: juego, 7: pausa, 8: configuracion de resolucion, 9: conf control
+	//6: juego, 7: pausa, 8: menu de opciones principal, 9: conf control
 	int estadoJuego;
 	infoScene *infEsc;
 	int tiempoEstado;
 	int cargaArchivosCompleta;
 	int opcionMenuSelec;
+
+	opcionesMenuPrincipal opMenuPrinc;
+
 };
 
 struct paramObj

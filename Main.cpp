@@ -2052,6 +2052,7 @@ void dibujaPantallaDeIntroduccion() { //Para dibujar en la pantalla.
 
 }
 
+
 void dibujaTituloJuego() { //Para dibujar en la pantalla.
 
 	glDisable(GL_DEPTH_TEST);							// Desactiva prueba de profundidad
@@ -2107,6 +2108,84 @@ void dibujaTituloJuego() { //Para dibujar en la pantalla.
 		glDisable(GL_ALPHA_TEST);
 	}
 
+
+
+	glDisable(GL_ALPHA_TEST);
+
+	glEnable(GL_LIGHTING);
+
+	glMatrixMode(GL_PROJECTION);						// Selecciona la matriz de proyeccion
+	glPopMatrix();										// Restaura la matriz de proyeccion anterior
+	glMatrixMode(GL_MODELVIEW);							// Selecciona la matriz de modelo de vista
+	glPopMatrix();										// Restaura la matriz de modelo de vista anterior
+	glEnable(GL_DEPTH_TEST);							// Activa prueba de profundidad
+
+}
+
+void dibujaMenuOpciones() { //Para dibujar en la pantalla.
+
+	glDisable(GL_DEPTH_TEST);							// Desactiva prueba de profundidad
+	glMatrixMode(GL_PROJECTION);						// Selecciona la matriz de proyeccion
+	glPushMatrix();										// Guarda la matriz de proyeccion
+	glLoadIdentity();									// Limpia la matriz de proyeccion
+	glOrtho(0, infGame.glWidth, 0, infGame.glHeight, -1, 1);					// Crea una proyección paralela
+	glMatrixMode(GL_MODELVIEW);							// Selecciona la matriz de modelo de vista
+	glPushMatrix();										// Guarda matriz de modelo de vista
+	glLoadIdentity();
+
+	glDisable(GL_LIGHTING);
+	//AQUI SE VA A PONER LA TEXTURA DEL TITULO DEL JUEGO
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textura[31].texID);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 0.0f); glVertex2f(infGame.glWidth*0.0f, infGame.glHeight*0.0f);
+	glTexCoord2f(0.5f, 0.0f); glVertex2f(infGame.glWidth*1.0f, infGame.glHeight*0.0f);
+	glTexCoord2f(0.5f, 0.3f); glVertex2f(infGame.glWidth*1.0f, infGame.glHeight*1.0f);
+	glTexCoord2f(0.0f, 0.3f); glVertex2f(infGame.glWidth*0.0f, infGame.glHeight*1.0f);
+	glEnd();
+
+		glAlphaFunc(GL_GREATER, 0.6f);
+		glEnable(GL_ALPHA_TEST);
+
+		if (infGame.opMenuPrinc.opcionSelec == 0)
+			glColor3f(1.0f, 0.0f, 0.0f);
+		else
+			glColor3f(1.0f, 1.0f, 1.0f);
+
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.8f, "Dificultad");
+
+		if (infGame.opMenuPrinc.opcionSelec == 1)
+			glColor3f(1.0f, 0.0f, 0.0f);
+		else
+			glColor3f(1.0f, 1.0f, 1.0f);
+
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.6f, "No. Vidas");
+
+		if (infGame.opMenuPrinc.opcionSelec == 2)
+			glColor3f(1.0f, 0.0f, 0.0f);
+		else
+			glColor3f(1.0f, 1.0f, 1.0f);
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.3f, "Sonido");
+
+		if (infGame.opMenuPrinc.opcionSelec == 3)
+			glColor3f(1.0f, 0.0f, 0.0f);
+		else
+			glColor3f(1.0f, 1.0f, 1.0f);
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.15f, "Regresar");
+
+		glColor3f(1.0f, 1.0f, 1.0f);
+		
+		//Opciones de dificultad
+		if (infGame.opMenuPrinc.dificultad = 0)
+			Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.25f, infGame.glHeight*0.8f, "Facil");
+		else if (infGame.opMenuPrinc.dificultad = 1)
+			Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.25f, infGame.glHeight*0.8f, "Normal");
+		else if (infGame.opMenuPrinc.dificultad = 2)
+			Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.25f, infGame.glHeight*0.8f, "Dificil");
+
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_ALPHA_TEST);
+	
 
 
 	glDisable(GL_ALPHA_TEST);
@@ -2256,6 +2335,69 @@ void dibujaVolumendeSombra() {
 	glEnd();
 }
 
+void dibujaVolumendeSombra2()
+{
+	CVector vert[2];
+	CVector vertP[2]; //vertices proyectados
+	CVector vertD[2]; //direccion de proyeccion del vertice
+	CVector centro;
+	CVector centroP;
+	CVector centroD;
+
+	CVector posLuz = CVector(player1.PosicionObj.x - 3.0f, player1.PosicionObj.y + 35.0f, player1.PosicionObj.z - 1.0f);
+
+	float ang, deltaAng;
+
+	deltaAng = 360.0f / 16;
+
+	for (int i = 0; i < 16; i++)
+	{
+		ang = i*deltaAng;
+		vert[0].x = player1.PosicionObj.x + 1.5f*cos(ang*PI/180.0f);
+		vert[0].y = player1.PosicionObj.y + 4.0f;
+		vert[0].z = player1.PosicionObj.z + 1.5f*sin(ang*PI/180.0f);
+
+		ang = (i+1)*deltaAng;
+		vert[1].x = player1.PosicionObj.x + 1.5f*cos(ang*PI / 180.0f);
+		vert[1].y = player1.PosicionObj.y + 4.0f;
+		vert[1].z = player1.PosicionObj.z + 1.5f*sin(ang*PI / 180.0f);
+
+		centro.x = player1.PosicionObj.x;
+		centro.y = player1.PosicionObj.y + 4.0f;
+		centro.z = player1.PosicionObj.z;
+
+		vertD[0] = Normaliza(vert[0] - posLuz);
+		vertD[1] = Normaliza(vert[1] - posLuz);
+		
+	
+		centroP = centro + centroD * 200;
+		
+		vertP[0] = vert[0] + vertD[0] * 200.0f;
+		vertP[1] = vert[1] + vertD[1] * 200.0f;
+
+		glBegin(GL_TRIANGLES);
+			glVertex3f(vert[1].x, vert[1].y, vert[1].z);
+			glVertex3f(vert[0].x, vert[0].y, vert[0].z);
+			glVertex3f(player1.PosicionObj.x, player1.PosicionObj.y + 4, player1.PosicionObj.z);
+		glEnd();
+
+		glBegin(GL_QUADS);
+			glVertex3f(vertP[1].x, vertP[1].y, vertP[1].z);
+			glVertex3f(vertP[0].x, vertP[0].y, vertP[0].z);
+			glVertex3f(vert[0].x, vert[0].y, vert[0].z);
+			glVertex3f(vert[1].x, vert[1].y, vert[1].z);
+		glEnd();
+
+		glBegin(GL_TRIANGLES);
+		glVertex3f(vertP[0].x, vertP[0].y, vertP[0].z);
+		glVertex3f(vertP[1].x, vertP[1].y, vertP[1].z);
+		glVertex3f(centroP.x, centroP.y, centroP.z);
+		glEnd();
+		
+	}
+
+
+}
 
 int RenderizaEscena(GLvoid)
 {
@@ -2308,7 +2450,8 @@ int RenderizaEscena(GLvoid)
 	//Segundo paso de prueba de pase de profundidad.
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT); 
-	dibujaVolumendeSombra();
+	//DibujaVolumendeSombra();
+	dibujaVolumendeSombra2();
 
 	glCullFace(GL_BACK);
 
@@ -2396,6 +2539,15 @@ void dibujaSegunEstado() { //Según el estado de dibujo!
 			else if (tipoAnim == 2) //hurricane kick
 				animacion(KeyFrame2, maxKF2, 3);
 		}
+	}
+
+	else if (infGame.estadoJuego == 8)
+	{
+		glClearColor(0.0f, 0.0f, 0.0f, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glLoadIdentity();
+
+		dibujaMenuOpciones();
 	}
 }
 
@@ -2701,6 +2853,8 @@ void manejaEventosMain()
 {
 	static int estadoTeclaUp = 0;
 	static int estadoTeclaDown = 0;
+	static int estadoTeclaLeft = 0;
+	static int estadoTeclaRight = 0;
 	static int estadoTeclaEnter = 0;
 
 	if (infGame.estadoJuego == 5) //Menú principal
@@ -2733,17 +2887,72 @@ void manejaEventosMain()
 
 		if (controlFunc.obtieneEstadoTecla(6) == 1) //Enter
 		{
-			if (estadoTeclaEnter == 0)
-			{
+			/*if (estadoTeclaEnter == 0)
+			{*/
 				if (infGame.opcionMenuSelec == 0)
 					infGame.estadoJuego = 6;
+				else if (infGame.opcionMenuSelec == 1)
+					infGame.estadoJuego = 8;
 
-				estadoTeclaEnter = 1;
+			/*	estadoTeclaEnter = 1;
+			}*/
+		}
+	//	else if (controlFunc.obtieneEstadoTecla(6) == 0) //Enter
+		//	estadoTeclaEnter = 0;
+	}
+	if (infGame.estadoJuego == 8) //Menú opciones principal
+	{
+		if (controlFunc.obtieneEstadoTecla(0) == 1) //Up
+		{
+			if (estadoTeclaUp == 0)
+			{
+				if (infGame.opMenuPrinc.opcionSelec > 0)
+					infGame.opMenuPrinc.opcionSelec--;
+
+				estadoTeclaUp = 1;
 			}
 		}
-		else if (controlFunc.obtieneEstadoTecla(6) == 0) //Enter
-			estadoTeclaEnter = 0;
+		else if (controlFunc.obtieneEstadoTecla(0) == 0) //Up
+			estadoTeclaUp = 0;
+
+		if (controlFunc.obtieneEstadoTecla(1) == 1) //Down
+		{
+			if (estadoTeclaDown == 0)
+			{
+				if (infGame.opMenuPrinc.opcionSelec < 3)
+					infGame.opMenuPrinc.opcionSelec++;
+
+				estadoTeclaDown = 1;
+			}
+		}
+		else if (controlFunc.obtieneEstadoTecla(1) == 0) //Down
+			estadoTeclaDown = 0;
+
+		if (controlFunc.obtieneEstadoTecla(2) == 1) //Left
+		{
+			if (estadoTeclaLeft == 0)
+			{
+				if (infGame.opMenuPrinc.dificultad > 0)
+					infGame.opMenuPrinc.dificultad--;
+			}
+
+		}
+
+		if (controlFunc.obtieneEstadoTecla(6) == 1) //Enter
+		{
+			/*if (estadoTeclaEnter == 0)
+			{*/
+			if (infGame.opMenuPrinc.opcionSelec == 3)
+				infGame.estadoJuego = 5;
+
+			/*	estadoTeclaEnter = 1;
+			}*/
+		}
+		//	else if (controlFunc.obtieneEstadoTecla(6) == 0) //Enter
+		//	estadoTeclaEnter = 0;
 	}
+
+
 	else if (infGame.estadoJuego == 6)
 	{
 		if (controlFunc.obtieneEstadoTecla(0) == 1) //Up
