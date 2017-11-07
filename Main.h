@@ -48,6 +48,8 @@ struct infoGame
 	int tiempoEstado;
 	int cargaArchivosCompleta;
 	int opcionMenuSelec;
+	int opcionMenuPausa;
+	int pausa;
 
 	opcionesMenuPrincipal opMenuPrinc;
 
