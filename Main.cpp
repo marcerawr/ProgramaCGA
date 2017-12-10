@@ -17,6 +17,7 @@ infoGame infGame;
 CVector posCamV;
 CVector dirCamV;
 CVector vecCamVPl;
+int rotCamara;
 int detectado = 0;
 
 //Apuntador para primitivas de cuadricas
@@ -65,6 +66,9 @@ t3DModel g_3DModel1e;
 
 //Objeto para acceder a las variables de control del personaje
 paramObj player1;
+
+//Variables para el control de la cámara de seguridad
+paramObj camSeg;
 
 //Objeto para manejo de la cámara
 paramCam camara1;
@@ -1125,13 +1129,37 @@ void DibujaTransportadora()
 void dibujaCamara()
 {
 	glPushMatrix();
-	glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
-	gluCylinder(e, 1.0f, 1.0f, 5.0f, 12, 1);
-	glPushMatrix();
-	glTranslatef(0.0f, 0.0f, 5.0f);
-	gluDisk(e, 0.0f, 1.0f, 12, 1);
+		glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+		gluCylinder(e, 1.0f, 1.0f, 5.0f, 12, 1);
+			glPushMatrix();
+				glTranslatef(0.0f, 0.0f, 5.0f);
+				gluDisk(e, 0.0f, 1.0f, 12, 1);
+			glPopMatrix();
 	glPopMatrix();
-	glPopMatrix();
+}
+
+void controlCamara(int funcion)
+{
+
+	if (funcion == 1) //Giro a la izquierda
+	{
+		rotCamara = rotCamara - 1;
+		if (rotCamara == -359.0f)
+		{
+				rotCamara = 0;				
+		}
+	}
+	else if (funcion == 2) //Giro a la derecha
+	{
+		rotCamara = rotCamara + 1;
+	
+		if (rotCamara == 359.0f)
+		{
+			rotCamara = 0;
+		}
+	}
+	
+	dirCamV = CVector(rotCamara,0.0f,1.0f);
 }
 
 void ejemploDeteccionCamara()
@@ -2041,26 +2069,13 @@ void dibujaTituloJuego() { //Para dibujar en la pantalla.
 			glColor3f(1.0f, 1.0f, 1.0f);
 
 		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.38f, infGame.glHeight*0.50f, "Start");
-
+				
 		if (infGame.opcionMenuSelec == 1)
 			glColor3f(0.0f, 1.0f, 0.0f);
 		else
 			glColor3f(1.0f, 1.0f, 1.0f);
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.34f, infGame.glHeight*0.40f, "Load Game");
 
-		if (infGame.opcionMenuSelec == 2)
-			glColor3f(0.0f, 1.0f, 0.0f);
-		else
-			glColor3f(1.0f, 1.0f, 1.0f);
-
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.38f, infGame.glHeight*0.30f, "Options");
-		
-		if (infGame.opcionMenuSelec == 3)
-			glColor3f(0.0f, 1.0f, 0.0f);
-		else
-			glColor3f(1.0f, 1.0f, 1.0f);
-
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.38f, infGame.glHeight*0.20f, "Quit");
+		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.38f, infGame.glHeight*0.40f, "Quit");
 
 		glColor3f(1.0f, 1.0f, 1.0f);
 		glDisable(GL_TEXTURE_2D);
@@ -2158,87 +2173,6 @@ void dibujaPantallaDeIntroduccion() { //Para dibujar en la pantalla.
 
 }
 
-void dibujaMenuOpciones()
-{
-	glDisable(GL_DEPTH_TEST);							// Desactiva prueba de profundidad
-	glMatrixMode(GL_PROJECTION);						// Selecciona la matriz de proyeccion
-	glPushMatrix();										// Guarda la matriz de proyeccion
-	glLoadIdentity();									// Limpia la matriz de proyeccion
-	glOrtho(0, infGame.glWidth, 0, infGame.glHeight, -1, 1);					// Crea una proyección paralela
-	glMatrixMode(GL_MODELVIEW);							// Selecciona la matriz de modelo de vista
-	glPushMatrix();										// Guarda matriz de modelo de vista
-	glLoadIdentity();
-
-	glDisable(GL_LIGHTING);
-	glEnable(GL_TEXTURE_2D);
-
-	glBindTexture(GL_TEXTURE_2D, textura[31].texID);
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f, 0.0f); glVertex2f(infGame.glWidth*0.0f, infGame.glHeight*0.0f);
-	glTexCoord2f(0.5f, 0.0f); glVertex2f(infGame.glWidth*1.0f, infGame.glHeight*0.0f);
-	glTexCoord2f(0.5f, 0.3f); glVertex2f(infGame.glWidth*1.0f, infGame.glHeight*1.0f);
-	glTexCoord2f(0.0f, 0.3f); glVertex2f(infGame.glWidth*0.0f, infGame.glHeight*1.0f);
-	glEnd();
-
-	glAlphaFunc(GL_GREATER, 0.6f);
-	glEnable(GL_ALPHA_TEST);
-
-	if (infGame.opMenuPrinc.opcionSelec == 0)
-		glColor3f(0.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 1.0f, 1.0f);
-	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.8f, "Dificultad:");
-
-	if (infGame.opMenuPrinc.opcionSelec == 1)
-		glColor3f(0.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 1.0f, 1.0f);
-	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.6f, "Num. vidas:");
-
-	if (infGame.opMenuPrinc.opcionSelec == 2)
-		glColor3f(0.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 1.0f, 1.0f);
-	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.4f, "Sonido:");
-
-	if (infGame.opMenuPrinc.opcionSelec == 3)
-		glColor3f(0.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 1.0f, 1.0f);
-	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.15f, infGame.glHeight*0.2f, "Regresar");
-
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-	//Opciones de dificultad
-	if (infGame.opMenuPrinc.dificultad == 0)
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.6f, infGame.glHeight*0.8f, "Facil");
-	else if (infGame.opMenuPrinc.dificultad == 1)
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.6f, infGame.glHeight*0.8f, "Normal");
-	else if (infGame.opMenuPrinc.dificultad == 2)
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.6f, infGame.glHeight*0.8f, "Dificil");
-
-	//No. de vidas
-	if (infGame.opMenuPrinc.numVidas == 0)
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.7f, infGame.glHeight*0.6f, "3");
-	else if (infGame.opMenuPrinc.numVidas == 1)
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.7f, infGame.glHeight*0.6f, "5");
-	else if (infGame.opMenuPrinc.numVidas == 2)
-		Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.7f, infGame.glHeight*0.6f, "7");
-
-	glDisable(GL_ALPHA_TEST);
-
-	glDisable(GL_TEXTURE_2D);
-
-	glEnable(GL_LIGHTING);
-
-	glMatrixMode(GL_PROJECTION);						// Selecciona la matriz de proyeccion
-	glPopMatrix();										// Restaura la matriz de proyeccion anterior
-	glMatrixMode(GL_MODELVIEW);							// Selecciona la matriz de modelo de vista
-	glPopMatrix();										// Restaura la matriz de modelo de vista anterior
-	glEnable(GL_DEPTH_TEST);							// Activa prueba de profundidad
-}
-
 void dibujaMenuPausa()
 {
 	glDisable(GL_DEPTH_TEST);							// Desactiva prueba de profundidad
@@ -2271,19 +2205,7 @@ void dibujaMenuPausa()
 		glColor3f(0.0f, 1.0f, 0.0f);
 	else
 		glColor3f(1.0f, 1.0f, 1.0f);
-	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.26f, infGame.glHeight*0.61f, "Save game");
-
-	if (infGame.opcionMenuPausa == 1)
-		glColor3f(0.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 1.0f, 1.0f);
-	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.25f, infGame.glHeight*0.46f, "Main menu");
-
-	if (infGame.opcionMenuPausa == 2)
-		glColor3f(0.0f, 1.0f, 0.0f);
-	else
-		glColor3f(1.0f, 1.0f, 1.0f);
-	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.4f, infGame.glHeight*0.31f, "Quit");
+	Font.glPrint((2.2f / 640.0f)*infGame.glWidth, infGame.glWidth*0.40f, infGame.glHeight*0.40f, "Quit");
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -2341,85 +2263,18 @@ void ejemploBackFaceCulling()
 
 void dibujaVolumendeSombra()
 {
-	CVector posLuz = CVector(player1.PosicionObj.x - 3.0f, player1.PosicionObj.y + 35.0f, player1.PosicionObj.z - 1.0f);
-	CVector v1 = CVector(player1.PosicionObj.x - 1.5f, player1.PosicionObj.y + 4.0f, player1.PosicionObj.z + 1.5f);
-	CVector v2 = CVector(player1.PosicionObj.x + 1.5f, player1.PosicionObj.y + 4.0f, player1.PosicionObj.z + 1.5f);
-	CVector v3 = CVector(player1.PosicionObj.x + 1.5f, player1.PosicionObj.y + 4.0f, player1.PosicionObj.z - 1.5f);
-	CVector v4 = CVector(player1.PosicionObj.x - 1.5f, player1.PosicionObj.y + 4.0f, player1.PosicionObj.z - 1.5f);
-
-	CVector v1d = Normaliza(v1 - posLuz);
-	CVector v2d = Normaliza(v2 - posLuz);
-	CVector v3d = Normaliza(v3 - posLuz);
-	CVector v4d = Normaliza(v4 - posLuz);
-
-	CVector v1p = v1 + v1d*200.0f;
-	CVector v2p = v2 + v2d*200.0f;
-	CVector v3p = v3 + v3d*200.0f;
-	CVector v4p = v4 + v4d*200.0f;
-
-	//1
-	glBegin(GL_QUADS);
-	glVertex3f(v1.x, v1.y, v1.z);
-	glVertex3f(v2.x, v2.y, v2.z);
-	glVertex3f(v3.x, v3.y, v3.z);
-	glVertex3f(v4.x, v4.y, v4.z);
-	glEnd();
-
-	//2
-	glBegin(GL_QUADS);
-	glVertex3f(v1p.x, v1p.y, v1p.z);
-	glVertex3f(v2p.x, v2p.y, v2p.z);
-	glVertex3f(v2.x, v2.y, v2.z);
-	glVertex3f(v1.x, v1.y, v1.z);
-	glEnd();
-
-	//3
-	glBegin(GL_QUADS);
-	glVertex3f(v4p.x, v4p.y, v4p.z);
-	glVertex3f(v1p.x, v1p.y, v1p.z);
-	glVertex3f(v1.x, v1.y, v1.z);
-	glVertex3f(v4.x, v4.y, v4.z);
-	glEnd();
-
-	//4
-	glBegin(GL_QUADS);
-	glVertex3f(v2p.x, v2p.y, v2p.z);
-	glVertex3f(v3p.x, v3p.y, v3p.z);
-	glVertex3f(v3.x, v3.y, v3.z);
-	glVertex3f(v2.x, v2.y, v2.z);
-	glEnd();
-
-	//5
-	glBegin(GL_QUADS);
-	glVertex3f(v3p.x, v3p.y, v3p.z);
-	glVertex3f(v4p.x, v4p.y, v4p.z);
-	glVertex3f(v4.x, v4.y, v4.z);
-	glVertex3f(v3.x, v3.y, v3.z);
-	glEnd();
-
-	//6
-	glBegin(GL_QUADS);
-	glVertex3f(v2p.x, v2p.y, v2.z);
-	glVertex3f(v1p.x, v1p.y, v1p.z);
-	glVertex3f(v4p.x, v4p.y, v4p.z);
-	glVertex3f(v3p.x, v3p.y, v3p.z);
-	glEnd();
-}
-
-void dibujaVolumendeSombra2()
-{
 	CVector vert[2];
-	CVector vertP[2];
-	CVector vertD[2];
+	CVector vertP[2]; //Vertices proyectados
+	CVector vertD[2]; //Vertices de dirección
 	CVector centro, centroP, centroD;
 
 	CVector posLuz = CVector(player1.PosicionObj.x - 3.0f, player1.PosicionObj.y + 35.0f, player1.PosicionObj.z - 1.0f);
 
 	float ang, deltaAng;
 
-	deltaAng = 360.0f / 16;
+	deltaAng = 360.0f / 16; //Angulo en que se dividirá la sombra
 
-	for (int i = 0; i<16; i++)
+	for (int i = 0; i<16; i++) //16 iteraciones son necesarias para "completar" el circulo"
 	{
 		ang = i*deltaAng;
 		vert[0].x = player1.PosicionObj.x + 1.5f*cos(ang*PI / 180.0f);
@@ -2443,23 +2298,23 @@ void dibujaVolumendeSombra2()
 		vertP[1] = vert[1] + vertD[1] * 200.0f;
 		centroP = centro + centroD*200.0f;
 
-		glBegin(GL_TRIANGLES);
-		glVertex3f(vert[1].x, vert[1].y, vert[1].z);
-		glVertex3f(vert[0].x, vert[0].y, vert[0].z);
-		glVertex3f(player1.PosicionObj.x, player1.PosicionObj.y + 4.0f, player1.PosicionObj.z);
+		glBegin(GL_TRIANGLES); //Dibuja el triangulo que proyecta la sombra
+		glVertex3f(vert[1].x, vert[1].y, vert[1].z); //vertice
+		glVertex3f(vert[0].x, vert[0].y, vert[0].z); //vertice
+		glVertex3f(player1.PosicionObj.x, player1.PosicionObj.y + 4.0f, player1.PosicionObj.z); //posiciona el objeto que da sombra arriba del personaje en el centro
 		glEnd();
 
-		glBegin(GL_QUADS);
-		glVertex3f(vertP[1].x, vertP[1].y, vertP[1].z);
-		glVertex3f(vertP[0].x, vertP[0].y, vertP[0].z);
-		glVertex3f(vert[0].x, vert[0].y, vert[0].z);
-		glVertex3f(vert[1].x, vert[1].y, vert[1].z);
+		glBegin(GL_QUADS); //Cuadro de referencia entre lado del triangulo superior y el inferior.
+		glVertex3f(vertP[1].x, vertP[1].y, vertP[1].z); //Vertice proyectado
+		glVertex3f(vertP[0].x, vertP[0].y, vertP[0].z); //Vertice Proyectado
+		glVertex3f(vert[0].x, vert[0].y, vert[0].z); //Vertice
+		glVertex3f(vert[1].x, vert[1].y, vert[1].z); //Vertice
 		glEnd();
 
-		glBegin(GL_TRIANGLES);
-		glVertex3f(vertP[0].x, vertP[0].y, vertP[0].z);
-		glVertex3f(vertP[1].x, vertP[1].y, vertP[1].z);
-		glVertex3f(centroP.x, centroP.y, centroP.z);
+		glBegin(GL_TRIANGLES); //Triagulo perteneciente al área afectada por la sombra
+		glVertex3f(vertP[0].x, vertP[0].y, vertP[0].z); //Proyectado
+		glVertex3f(vertP[1].x, vertP[1].y, vertP[1].z); //Proyectado
+		glVertex3f(centroP.x, centroP.y, centroP.z); //Centro proyectado
 		glEnd();
 
 	}
@@ -2486,8 +2341,17 @@ int RenderizaEscena(GLvoid)
 	glEnable(GL_LIGHT1);
 
 	DibujaEscenario();
-	ejemploDeteccionCamara();
 
+	//Camara de seguridad
+	if (player1.visible == true)
+	{
+		glPushMatrix();
+		glRotatef(rotCamara, 0.0f, 1.0f, 0.0f);
+		ejemploDeteccionCamara();
+		glPopMatrix();
+	}
+
+	
 	if (player1.visible == true)
 	{
 		glPushMatrix();
@@ -2497,7 +2361,7 @@ int RenderizaEscena(GLvoid)
 		DibujaPersonaje();
 		glPopMatrix();
 	}
-
+	
 	glColorMask(0, 0, 0, 0);
 	glDepthMask(0);
 
@@ -2508,12 +2372,12 @@ int RenderizaEscena(GLvoid)
 	//1er paso de la prueba de pase de profundidad
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
 	glCullFace(GL_BACK);
-	dibujaVolumendeSombra2();
+	dibujaVolumendeSombra();
 
 	//2do paso de la prueba de pase de profundidad
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	glCullFace(GL_FRONT);
-	dibujaVolumendeSombra2();
+	dibujaVolumendeSombra();
 
 	glCullFace(GL_BACK);
 
@@ -2527,7 +2391,7 @@ int RenderizaEscena(GLvoid)
 	glDisable(GL_LIGHT1);
 
 	DibujaEscenario();
-	ejemploDeteccionCamara();
+
 
 	if (player1.visible == true)
 	{
@@ -2607,7 +2471,6 @@ void dibujaSegunEstado()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glLoadIdentity();
 
-		dibujaMenuOpciones();
 	}
 }
 
@@ -2962,7 +2825,7 @@ void manejaEventosMain()
 		{
 			if (estadoTeclaDown == 0)
 			{
-				if (infGame.opcionMenuSelec < 2)
+				if (infGame.opcionMenuSelec < 1)
 					infGame.opcionMenuSelec++;
 
 				estadoTeclaDown = 1;
@@ -2977,13 +2840,9 @@ void manejaEventosMain()
 			{
 				if (infGame.opcionMenuSelec == 0)
 					infGame.estadoJuego = 6;
-				else if (infGame.opcionMenuSelec == 1)
-					cargaJuego();
-				else if (infGame.opcionMenuSelec == 2)
+			 else if (infGame.opcionMenuSelec == 1)
 				{
-					infGame.estadoJuego = 8;
-					menuOpcionesActivo = 0;
-					infGame.opMenuPrinc.opcionSelec = 0;
+					done = TRUE;		
 				}
 			}
 		}
@@ -3012,7 +2871,7 @@ void manejaEventosMain()
 		{
 			if (estadoTeclaDown == 0)
 			{
-				if (infGame.opMenuPrinc.opcionSelec < 3)
+				if (infGame.opMenuPrinc.opcionSelec < 1)
 					infGame.opMenuPrinc.opcionSelec++;
 
 				estadoTeclaDown = 1;
@@ -3021,43 +2880,16 @@ void manejaEventosMain()
 		else if (controlFunc.obtieneEstadoTecla(1) == 0) //Down
 			estadoTeclaDown = 0;
 
-		if (controlFunc.obtieneEstadoTecla(2) == 1) //Left
-		{
-			if (estadoTeclaLeft == 0)
-			{
-				if (infGame.opMenuPrinc.opcionSelec == 0) //dificultad
-				{
-					if (infGame.opMenuPrinc.dificultad > 0)
-						infGame.opMenuPrinc.dificultad--;
-				}
-
-				estadoTeclaLeft = 1;
-			}
-		}
-		else if (controlFunc.obtieneEstadoTecla(2) == 0) //Up
+	
+		 if (controlFunc.obtieneEstadoTecla(2) == 0) //Up
 			estadoTeclaLeft = 0;
 
-		if (controlFunc.obtieneEstadoTecla(3) == 1) //Right
-		{
-			if (estadoTeclaRight == 0)
-			{
-				if (infGame.opMenuPrinc.opcionSelec == 0) //dificultad
-				{
-					if (infGame.opMenuPrinc.dificultad < 2)
-						infGame.opMenuPrinc.dificultad++;
-				}
-
-				estadoTeclaRight = 1;
-			}
-		}
-		else if (controlFunc.obtieneEstadoTecla(3) == 0) //!Right
-			estadoTeclaRight = 0;
-
+		
 		if (controlFunc.obtieneEstadoTecla(6) == 1) //Enter
 		{
 			if (menuOpcionesActivo == 1)
 			{
-				if (infGame.opMenuPrinc.opcionSelec == 3)
+				if (infGame.opMenuPrinc.opcionSelec == 1)
 				{
 					infGame.estadoJuego = 5;
 					menuPrincipalActivo = 0;
@@ -3302,7 +3134,7 @@ void manejaEventosMain()
 			{
 				if (estadoTeclaDown == 0)
 				{
-					if (infGame.opcionMenuPausa < 2)
+					if (infGame.opcionMenuPausa < 0)
 						infGame.opcionMenuPausa++;
 
 					estadoTeclaDown = 1;
@@ -3315,254 +3147,24 @@ void manejaEventosMain()
 			{
 				if (estadoTeclaEnter == 0)
 				{
-					if (infGame.opcionMenuPausa == 0)
-						guardaJuego();
-					else if (infGame.opcionMenuPausa == 1)
-					{
-						infGame.estadoJuego = 5;
-						menuPrincipalActivo = 0;
-					}
-					else if (infGame.opcionMenuPausa == 2)
+					 if (infGame.opcionMenuPausa == 0)
+					{						
 						done = TRUE;						// ESC indica el termino del programa
-
-					estadoTeclaEnter = 1;
+						estadoTeclaEnter = 1;
+					}
 				}
 			}
 			else if (controlFunc.obtieneEstadoTecla(6) == 0) //Enter
 				estadoTeclaEnter = 0;
 		}
 	}
-}
 
-//int ManejaTeclado()
-//{
-//	//Al presionar cualquiera de las teclas de dirección se iniciará la animación de caminar
-//	//Al soltar la tecla presionada se detiene la animación.
-//	if(GetKeyState(VK_UP) & 0x80) //Si está presionada la tecla UP
-//	{
-//		if(player1.kick==false)
-//		{
-//			ControlPersonaje2(3);
-//			
-//			if(play==false) //Para que la asignación de valores siguiente solo se haga una vez y empiece la animación
-//			{
-//				//Se le asignan a las variables del personaje los 
-//				//valores almacenados en el primer keyframe para que
-//				//inicie desde ahí la animación.
-//				Angt1   = KeyFrame1[0].Angt1;
-//				Angt2   = KeyFrame1[0].Angt2;
-//				Angc1   = KeyFrame1[0].Angc1;
-//				Angc2   = KeyFrame1[0].Angc2;
-//				Angbi1  = KeyFrame1[0].Angbi1;
-//				Angbi2  = KeyFrame1[0].Angbi2;
-//				Angbib  = KeyFrame1[0].Angbib;
-//				Angbd1  = KeyFrame1[0].Angbd1;
-//				Angbd2  = KeyFrame1[0].Angbd2;
-//				Angbdb  = KeyFrame1[0].Angbdb;
-//				Angpizq = KeyFrame1[0].Angpizq;
-//				Angpder = KeyFrame1[0].Angpder;
-//				Angpi   = KeyFrame1[0].Angpi;
-//				Angpd   = KeyFrame1[0].Angpd;
-//				Xtor    = KeyFrame1[0].Xtor;
-//				Ytor    = KeyFrame1[0].Ytor;
-//				Ztor    = KeyFrame1[0].Ztor;
-//
-//				play=true;
-//				playIndex=0;
-//				tipoAnim=1;
-//			}
-//		}
-//	}
-//
-//	if(GetKeyState(VK_DOWN) & 0x80) //Si está presionada la tecla DOWN
-//	{
-//		if(player1.kick==false)
-//		{
-//			ControlPersonaje2(4);
-//			
-//			if(play==false && player1.kick==false) //Para que la asignación de valores siguiente solo se haga una vez y empiece la animación
-//			{
-//				//Se le asignan a las variables del personaje los 
-//				//valores almacenados en el primer keyframe para que
-//				//inicie desde ahí la animación.
-//				Angt1   = KeyFrame1[0].Angt1;
-//				Angt2   = KeyFrame1[0].Angt2;
-//				Angc1   = KeyFrame1[0].Angc1;
-//				Angc2   = KeyFrame1[0].Angc2;
-//				Angbi1  = KeyFrame1[0].Angbi1;
-//				Angbi2  = KeyFrame1[0].Angbi2;
-//				Angbib  = KeyFrame1[0].Angbib;
-//				Angbd1  = KeyFrame1[0].Angbd1;
-//				Angbd2  = KeyFrame1[0].Angbd2;
-//				Angbdb  = KeyFrame1[0].Angbdb;
-//				Angpizq = KeyFrame1[0].Angpizq;
-//				Angpder = KeyFrame1[0].Angpder;
-//				Angpi   = KeyFrame1[0].Angpi;
-//				Angpd   = KeyFrame1[0].Angpd;
-//				Xtor    = KeyFrame1[0].Xtor;
-//				Ytor    = KeyFrame1[0].Ytor;
-//				Ztor    = KeyFrame1[0].Ztor;
-//
-//				play=true;
-//				playIndex=0;
-//				tipoAnim=1;
-//			}
-//		}
-//	}
-//
-//	if(GetKeyState(VK_LEFT) & 0x80) //Si está presionada la tecla LEFT
-//	{
-//		if(player1.kick==false)
-//		{
-//			ControlPersonaje2(2);
-//		
-//			if(play==false && player1.kick==false) //Para que la asignación de valores siguiente solo se haga una vez y empiece la animación
-//			{
-//				//Se le asignan a las variables del personaje los 
-//				//valores almacenados en el primer keyframe para que
-//				//inicie desde ahí la animación.
-//				Angt1   = KeyFrame1[0].Angt1;
-//				Angt2   = KeyFrame1[0].Angt2;
-//				Angc1   = KeyFrame1[0].Angc1;
-//				Angc2   = KeyFrame1[0].Angc2;
-//				Angbi1  = KeyFrame1[0].Angbi1;
-//				Angbi2  = KeyFrame1[0].Angbi2;
-//				Angbib  = KeyFrame1[0].Angbib;
-//				Angbd1  = KeyFrame1[0].Angbd1;
-//				Angbd2  = KeyFrame1[0].Angbd2;
-//				Angbdb  = KeyFrame1[0].Angbdb;
-//				Angpizq = KeyFrame1[0].Angpizq;
-//				Angpder = KeyFrame1[0].Angpder;
-//				Angpi   = KeyFrame1[0].Angpi;
-//				Angpd   = KeyFrame1[0].Angpd;
-//				Xtor    = KeyFrame1[0].Xtor;
-//				Ytor    = KeyFrame1[0].Ytor;
-//				Ztor    = KeyFrame1[0].Ztor;
-//
-//				play=true;
-//				playIndex=0;
-//				tipoAnim=1;
-//			}
-//		}
-//	}
-//
-//	if(GetKeyState(VK_RIGHT) & 0x80) //Si está presionada la tecla RIGHT
-//	{
-//		if(player1.kick==false)
-//		{
-//			ControlPersonaje2(1);
-//			
-//			if(play==false && player1.kick==false) //Para que la asignación de valores siguiente solo se haga una vez y empiece la animación
-//			{
-//				//Se le asignan a las variables del personaje los 
-//				//valores almacenados en el primer keyframe para que
-//				//inicie desde ahí la animación.
-//				Angt1   = KeyFrame1[0].Angt1;
-//				Angt2   = KeyFrame1[0].Angt2;
-//				Angc1   = KeyFrame1[0].Angc1;
-//				Angc2   = KeyFrame1[0].Angc2;
-//				Angbi1  = KeyFrame1[0].Angbi1;
-//				Angbi2  = KeyFrame1[0].Angbi2;
-//				Angbib  = KeyFrame1[0].Angbib;
-//				Angbd1  = KeyFrame1[0].Angbd1;
-//				Angbd2  = KeyFrame1[0].Angbd2;
-//				Angbdb  = KeyFrame1[0].Angbdb;
-//				Angpizq = KeyFrame1[0].Angpizq;
-//				Angpder = KeyFrame1[0].Angpder;
-//				Angpi   = KeyFrame1[0].Angpi;
-//				Angpd   = KeyFrame1[0].Angpd;
-//				Xtor    = KeyFrame1[0].Xtor;
-//				Ytor    = KeyFrame1[0].Ytor;
-//				Ztor    = KeyFrame1[0].Ztor;
-//
-//				play=true;
-//				playIndex=0;
-//				tipoAnim=1;
-//			}
-//		}
-//	}
-//
-//	if((GetAsyncKeyState('Z')&1) == 1)
-//	{
-//		if(player1.kick == false) //Para que la asignación de valores siguiente solo se haga una vez y empiece la animación
-//		{
-//			//Se le asignan a las variables del personaje los 
-//			//valores almacenados en el primer keyframe para que
-//			//inicie desde ahí la animación.
-//			Angt1   = KeyFrame2[0].Angt1;
-//			Angt2   = KeyFrame2[0].Angt2;
-//			Angc1   = KeyFrame2[0].Angc1;
-//			Angc2   = KeyFrame2[0].Angc2;
-//			Angbi1  = KeyFrame2[0].Angbi1;
-//			Angbi2  = KeyFrame2[0].Angbi2;
-//			Angbib  = KeyFrame2[0].Angbib;
-//			Angbd1  = KeyFrame2[0].Angbd1;
-//			Angbd2  = KeyFrame2[0].Angbd2;
-//			Angbdb  = KeyFrame2[0].Angbdb;
-//			Angpizq = KeyFrame2[0].Angpizq;
-//			Angpder = KeyFrame2[0].Angpder;
-//			Angpi   = KeyFrame2[0].Angpi;
-//			Angpd   = KeyFrame2[0].Angpd;
-//			Xtor    = KeyFrame2[0].Xtor;
-//			Ytor    = KeyFrame2[0].Ytor;
-//			Ztor    = KeyFrame2[0].Ztor;
-//
-//			play=true;
-//			playIndex=0;
-//			tipoAnim=2;
-//
-//			player1.kick=true;
-//			player1.contAuxAnim=0;
-//		}
-//	}
-//
-//	//Para que al soltar la tecla presionada el personaje no quede en una posición
-//	//intermedia de la animación se asignan los valores originales a las variables
-//	if(!(GetKeyState(VK_UP) & 0x80 || GetKeyState(VK_DOWN) & 0x80
-//	|| GetKeyState(VK_LEFT) & 0x80  || GetKeyState(VK_RIGHT) & 0x80)) //Si no está presionada alguna de esas teclas
-//	{
-//		if(tipoAnim == 1)
-//		{
-//			play=false;
-//			Angt1   = 0.0f;
-//			Angt2   = 0.0f;
-//			Angc1   = 0.0f;
-//			Angc2   = 0.0f;
-//			Angbi1  = 0.0f;
-//			Angbi2  = 0.0f;
-//			Angbib  = 0.0f;
-//			Angbd1  = 0.0f;
-//			Angbd2  = 0.0f;
-//			Angbdb  = 0.0f;
-//			Angpizq = 0.0f;
-//			Angpder = 0.0f;
-//			Angpi   = 0.0f;
-//			Angpd   = 0.0f;
-//			Xtor    = 0.0f;
-//			Ytor    = 0.0f;
-//			Ztor    = 0.0f;
-//		}
-//	}
-//
-//	if(keys[VK_HOME])
-//	{
-//		ControlPersonaje(5);
-//	}
-//
-//	if(keys[VK_END])
-//	{
-//		ControlPersonaje(6);
-//	}
-//
-//	if(keys['A'])
-//	{
-//		
-//	}
-//	if(keys['S'])
-//	{
-//		
-//	}
-//	
-//
-//	return TRUE;
-//}
+	if (keys['A'])
+	{
+		controlCamara(1);
+	}
+	if (keys['S'])
+	{
+		controlCamara(2);
+	}
+}

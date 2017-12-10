@@ -1,5 +1,4 @@
-﻿D:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.Cpp.Common.props(150,5): warning MSB4211: La propiedad "WindowsTargetPlatformVersion" se va a establecer en un valor por primera vez, pero ya se utilizó en "D:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.Cpp.WindowsSDK.props (29,5)".
-cl : Línea de comandos warning D9007: '/Gm' requiere '/Zi o /ZI'; opción omitida
+﻿cl : Línea de comandos warning D9007: '/Gm' requiere '/Zi o /ZI'; opción omitida
   Main.cpp
-  OGL_CodigoBase.vcxproj -> D:\Users\marce\Documents\Noveno Semestre\Computacion Grafica Avanzada\19-10-2017\Programa base\Debug\OGL_CodigoBase.exe
-  OGL_CodigoBase.vcxproj -> D:\Users\marce\Documents\Noveno Semestre\Computacion Grafica Avanzada\19-10-2017\Programa base\Debug\OGL_CodigoBase.pdb (Full PDB)
+  OGL_CodigoBase.vcxproj -> D:\Users\marce\Documents\Noveno Semestre\Computacion Grafica Avanzada\Programa\ProgramaCGA\Debug\OGL_CodigoBase.exe
+  OGL_CodigoBase.vcxproj -> D:\Users\marce\Documents\Noveno Semestre\Computacion Grafica Avanzada\Programa\ProgramaCGA\Debug\OGL_CodigoBase.pdb (Full PDB)
